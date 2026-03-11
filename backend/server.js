@@ -1,25 +1,12 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const connectDB = require("./config/database"); // Dùng file có sẵn
-const { createServer } = require("http");
-const { Server } = require("socket.io");
+const connectDB = require("./config/database");
 
-// Connect Database (dùng file database.js của bạn)
+// Connect Database
 connectDB();
 
 const app = express();
-const httpServer = createServer(app);
-
-// Socket.io
-const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
-    methods: ["GET", "POST"],
-  },
-});
-
-app.set("io", io);
 
 // Middleware
 app.use(
@@ -51,22 +38,7 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Socket.io
-io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
-
-  socket.on("join-topic", (topicId) => {
-    socket.join(`topic-${topicId}`);
-  });
-
-  socket.on("leave-topic", (topicId) => {
-    socket.leave(`topic-${topicId}`);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
-  });
-});
-
 const PORT = process.env.PORT || 5000;
-httpServer.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+});
