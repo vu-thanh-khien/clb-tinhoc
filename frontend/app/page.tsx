@@ -9,7 +9,7 @@ export default function Home() {
     fetch("https://clb-tinhoc-api.onrender.com/api/health")
       .then((res) => res.json())
       .then((data) => {
-        setStatus(data.status + " - Database: " + data.db);
+        setStatus(`OK - Database: ${data.db}`);
       })
       .catch(() => {
         setStatus("Không kết nối được Backend");
@@ -19,8 +19,8 @@ export default function Home() {
   return (
     <div style={{ padding: 40 }}>
       <h1>CLB Tin học - Trường THCS Hải Thành</h1>
-      <h2>Trạng thái hệ thống:</h2>
-      <p>{status}</p>
+      <p>Trạng thái hệ thống:</p>
+      <strong>{status}</strong>
     </div>
   );
 }
