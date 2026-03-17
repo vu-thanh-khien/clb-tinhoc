@@ -67,7 +67,7 @@ function Contact() {
     {
       icon: <Phone className="h-6 w-6" />,
       title: "Hotline",
-      content: "0123.456.789",
+      content: "0904.168.234",
       color: "bg-green-100 text-green-600",
     },
     {
@@ -79,7 +79,7 @@ function Contact() {
     {
       icon: <MapPin className="h-6 w-6" />,
       title: "Địa chỉ",
-      content: "THCS Hải Thành, Hải Hậu, Nam Định",
+      content: "THCS Hải Thành, phường Dương Kinh, TP. Hải Phòng",
       color: "bg-red-100 text-red-600",
     },
   ];
@@ -205,7 +205,7 @@ function Contact() {
                       <input
                         type="tel"
                         className={`w-full px-4 py-3 rounded-lg border ${errors.phone ? "border-red-500" : "border-gray-300"} focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
-                        placeholder="0123 456 789"
+                        placeholder="0904 168 234"
                         value={formData.phone}
                         onChange={(e) =>
                           setFormData({ ...formData, phone: e.target.value })

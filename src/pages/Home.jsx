@@ -289,7 +289,7 @@ function Home() {
       number: 25,
       suffix: "+",
       label: "Giải thưởng",
-      description: "Các cấp huyện, tỉnh",
+      description: "Các cấp phường, tỉnh",
     },
     {
       icon: Zap,
@@ -305,7 +305,7 @@ function Home() {
       name: "Nguyễn Văn A",
       role: "Học sinh lớp 9",
       content:
-        "CLB đã giúp mình đạt giải Nhì Olympic Tin học cấp tỉnh. Thầy Khiên dạy rất tận tâm!",
+        "CLB đã giúp mình đạt giải Nhất Tin học cấp phường. Thầy Khiên dạy rất tận tâm!",
       avatar: "/images/avatar-1.jpg",
     },
     {
@@ -362,7 +362,7 @@ function Home() {
               <div className="space-y-8 text-center lg:text-left">
                 <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-sm text-blue-200">
                   <Sparkles className="h-4 w-4 text-yellow-400" />
-                  <span>CLB Xuất sắc năm học 2024-2025</span>
+                  <span>CLB Xuất sắc năm học 2025-2026</span>
                 </div>
 
                 <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight">
@@ -445,7 +445,7 @@ function Home() {
                   </div>
                   <div className="absolute -bottom-4 -left-4 bg-white text-blue-600 px-4 py-3 rounded-xl shadow-lg font-semibold flex items-center gap-2">
                     <Star className="h-5 w-5 text-yellow-500 fill-current" />
-                    CLB xuất sắc 2024
+                    CLB xuất sắc 2025
                   </div>
                 </div>
               </div>
@@ -556,7 +556,7 @@ function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-16">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                Cảm nhận học viên
+                Cảm nhận học sinh
               </h2>
               <p className="text-slate-400">
                 Những chia sẻ từ học sinh và phụ huynh

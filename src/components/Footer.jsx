@@ -121,7 +121,7 @@ function Footer() {
                 <div className="p-2 bg-slate-800 rounded-lg group-hover:bg-blue-600 transition-colors">
                   <Phone className="h-4 w-4" />
                 </div>
-                0123.456.789
+                0904.168.234
               </a>
               <div className="flex items-start gap-3 text-sm">
                 <div className="p-2 bg-slate-800 rounded-lg">
