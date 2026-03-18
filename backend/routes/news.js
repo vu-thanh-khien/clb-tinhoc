@@ -13,23 +13,28 @@ const NewsSchema = new mongoose.Schema({
 
 const News = mongoose.model("News", NewsSchema);
 
-// Lấy danh sách bài viết
+// Lấy tất cả bài viết
 router.get("/", async (req, res) => {
   const news = await News.find().sort({ createdAt: -1 });
   res.json(news);
 });
 
-// Tạo bài viết
+// Thêm bài viết
 router.post("/", async (req, res) => {
-  const { title, content } = req.body;
+  try {
+    const { title, content } = req.body;
 
-  const news = new News({
-    title,
-    content,
-  });
+    const newNews = new News({
+      title,
+      content,
+    });
 
-  await news.save();
-  res.json(news);
+    await newNews.save();
+
+    res.json(newNews);
+  } catch (err) {
+    res.status(500).json({ error: "Không tạo được bài viết" });
+  }
 });
 
 module.exports = router;
