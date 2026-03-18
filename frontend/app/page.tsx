@@ -6,14 +6,19 @@ export default function Home() {
   const [status, setStatus] = useState("Đang kiểm tra kết nối...");
 
   useEffect(() => {
-    fetch("https://clb-tinhoc-api.onrender.com/api/health")
-      .then((res) => res.json())
-      .then((data) => {
+    async function checkAPI() {
+      try {
+        const res = await fetch(
+          "https://clb-tinhoc-api.onrender.com/api/health",
+        );
+        const data = await res.json();
         setStatus(`OK - Database: ${data.db}`);
-      })
-      .catch(() => {
+      } catch (error) {
         setStatus("Không kết nối được Backend");
-      });
+      }
+    }
+
+    checkAPI();
   }, []);
 
   return (
