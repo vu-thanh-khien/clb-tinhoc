@@ -1,13 +1,44 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { Eye, EyeOff, Code2, ArrowLeft, Loader2 } from "lucide-react";
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
-import { auth, db } from "../lib/firebase";
+
+// API URL từ biến môi trường
+const API_URL =
+  import.meta.env.VITE_API_URL || "https://clb-tinhoc-api.onrender.com/api";
+
+// Helper gọi API
+async function fetchAPI(endpoint, options = {}) {
+  const response = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      ...options.headers,
+    },
+  });
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Request failed");
+  }
+
+  return data;
+}
+
+// Auth API
+const authAPI = {
+  login: (data) =>
+    fetchAPI("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  register: (data) =>
+    fetchAPI("/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+};
 
 function Login() {
   const navigate = useNavigate();
@@ -29,115 +60,59 @@ function Login() {
     });
   };
 
-  // 🔐 LOGIN
+  // 🔐 LOGIN - Gọi Backend API
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      console.log("=== LOGIN START ===");
-      console.log("Email:", formData.email);
+      const result = await authAPI.login({
+        email: formData.email,
+        password: formData.password,
+      });
 
-      const result = await signInWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password,
-      );
-
-      const user = result.user;
-      console.log("Login success, UID:", user.uid);
-
-      // Lưu localStorage
+      // Lưu token và thông tin user
+      localStorage.setItem("token", result.token);
+      localStorage.setItem("user", JSON.stringify(result.user));
       localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userId", user.uid);
-      localStorage.setItem("userEmail", user.email);
-      localStorage.setItem("userName", user.displayName || "User");
+      localStorage.setItem("userId", result.user.id);
+      localStorage.setItem("userEmail", result.user.email);
+      localStorage.setItem(
+        "userName",
+        result.user.username || result.user.name,
+      );
+      localStorage.setItem("userRole", result.user.role || "student");
 
-      // Giả định role từ email
-      const role = formData.email.includes("teacher")
-        ? "teacher"
-        : formData.email.includes("admin")
-          ? "admin"
-          : "student";
-      localStorage.setItem("userRole", role);
-
-      console.log("Role:", role);
-      console.log("=== LOGIN END ===");
-
+      // Chuyển trang theo role
+      const role = result.user.role || "student";
       navigate(role === "student" ? "/assignments" : "/admin");
     } catch (err) {
-      console.error("Login error:", err);
-      setError("Email hoặc mật khẩu không đúng!");
+      setError(err.message || "Email hoặc mật khẩu không đúng!");
     } finally {
       setIsLoading(false);
     }
   };
 
-  // 📝 REGISTER - Đơn giản nhất có thể
+  // 📝 REGISTER - Gọi Backend API
   const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
-      console.log("=== REGISTER START ===");
-      console.log("1. Creating auth user...");
-
-      // Bước 1: Tạo user trong Authentication
-      const result = await createUserWithEmailAndPassword(
-        auth,
-        formData.email,
-        formData.password,
-      );
-
-      const user = result.user;
-      console.log("2. Created user, UID:", user.uid);
-
-      // Bước 2: Cập nhật tên hiển thị
-      console.log("3. Updating profile...");
-      await updateProfile(user, {
-        displayName: formData.displayName,
-      });
-
-      // Bước 3: Lưu vào Firestore - Đơn giản nhất
-      console.log("4. Saving to Firestore...");
-
-      const userRef = doc(db, "users", user.uid);
-      await setDoc(userRef, {
-        uid: user.uid,
+      await authAPI.register({
+        name: formData.displayName,
+        username: formData.email.split("@")[0], // Tạo username từ email
         email: formData.email,
-        displayName: formData.displayName,
+        password: formData.password,
         role: formData.role,
-        createdAt: new Date().toISOString(),
       });
 
-      console.log("5. Saved to Firestore!");
-
-      // Bước 4: Lưu localStorage
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userId", user.uid);
-      localStorage.setItem("userEmail", user.email);
-      localStorage.setItem("userName", formData.displayName);
-      localStorage.setItem("userRole", formData.role);
-
-      console.log("6. Done! Redirecting...");
-      console.log("=== REGISTER END ===");
-
-      // Chuyển trang
-      navigate(formData.role === "student" ? "/assignments" : "/admin");
+      setError("Đăng ký thành công! Vui lòng đăng nhập.");
+      setIsRegistering(false); // Chuyển sang form login
     } catch (err) {
-      console.error("=== REGISTER ERROR ===");
-      console.error("Error code:", err.code);
-      console.error("Error message:", err.message);
-
-      if (err.code === "auth/email-already-in-use") {
-        setError("Email đã được sử dụng!");
-      } else if (err.code === "auth/weak-password") {
-        setError("Mật khẩu cần ít nhất 6 ký tự!");
-      } else {
-        setError("Đăng ký thất bại: " + err.message);
-      }
+      setError(err.message || "Đăng ký thất bại!");
     } finally {
       setIsLoading(false);
     }
@@ -166,7 +141,9 @@ function Login() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow rounded-lg sm:px-10">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded text-red-600 text-sm">
+            <div
+              className={`mb-4 p-3 rounded text-sm ${error.includes("thành công") ? "bg-green-50 text-green-600 border border-green-200" : "bg-red-50 text-red-600 border border-red-200"}`}
+            >
               {error}
             </div>
           )}
